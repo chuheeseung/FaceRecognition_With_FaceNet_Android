@@ -15,6 +15,7 @@
 
 package com.ml.quaterion.facenetdetection
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.media.Image
@@ -54,8 +55,8 @@ class FrameAnalyser( private var context: Context , private var boundingBoxOverl
     private val model = FaceNetModel( context )
 
     // Here's where we receive our frames.
+    @SuppressLint("UnsafeExperimentalUsageError")
     override fun analyze(image: ImageProxy?, rotationDegrees: Int) {
-
         // android.media.Image -> android.graphics.Bitmap
         val bitmap = toBitmap( image?.image!! )
 
@@ -114,9 +115,17 @@ class FrameAnalyser( private var context: Context , private var boundingBoxOverl
                                 Log.i( "Model" , "Average norm for each user : $nameNormHashMap" )
                                 // Get the names of unique users
                                 val names = nameNormHashMap.keys.map{ key -> key }
-
+                                var minL2NormName = names[ avgNorms.indexOf( avgNorms.min()!! ) ]
                                 // Calculate the minimum L2 distance from the stored average L2 norms.
-                                val minL2NormName = names[ avgNorms.indexOf( avgNorms.min()!! ) ]
+                                //threshold value
+                                if(avgNorms.min()!! < 15.0) {
+                                    Log.i("Model", ">>>>>>" + (avgNorms.min()!!).toString());
+                                    minL2NormName = names[avgNorms.indexOf(avgNorms.min()!!)]
+                                }
+                                else {
+                                    Log.i("Model", "<<<<<<<<<<<" + (avgNorms.min()!!).toString());
+                                    minL2NormName = "unknown!";
+                                }
 
                                 Log.i( "Model" , "Person identified as ${minL2NormName}" )
                                 // Push the results in form of a Prediction.
@@ -150,7 +159,7 @@ class FrameAnalyser( private var context: Context , private var boundingBoxOverl
     }
 
     // Use this method to save a Bitmap to the internal storage of your device.
-    private fun saveBitmap(image: Bitmap, name: String) {
+    public fun saveBitmap(image: Bitmap, name: String) {
         val fileOutputStream =
             FileOutputStream(File( Environment.getExternalStorageDirectory()!!.absolutePath + "/$name.png"))
         image.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
@@ -220,5 +229,7 @@ class FrameAnalyser( private var context: Context , private var boundingBoxOverl
         val yuv = out.toByteArray()
         return BitmapFactory.decodeByteArray(yuv, 0, yuv.size)
     }
+
+
 
 }
