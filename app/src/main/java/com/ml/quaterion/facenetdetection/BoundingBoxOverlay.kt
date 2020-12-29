@@ -57,14 +57,16 @@ class BoundingBoxOverlay( context: Context , attributeSet: AttributeSet )
 
     // Defines a Paint object for the boxes.
     private val boxPaint = Paint().apply {
-        color = Color.parseColor( "#4D90caf9" )
-        style = Paint.Style.FILL
+        color = Color.parseColor( "#d32f2f" )
+        style = Paint.Style.STROKE
+        strokeWidth = 5.0f
     }
     // Defines a Paint object for the text.
     private val textPaint = Paint().apply {
         strokeWidth = 2.0f
         textSize = 32f
         color = Color.WHITE
+        //color = Color.TRANSPARENT
     }
 
     // Determines which Matrix should be used for transformation.
